@@ -1,0 +1,9 @@
+llm_chain:
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    PhpLlm\LlmChain\Chain\ToolBox\Tool\Clock: ~
+    PhpLlm\LlmChain\Chain\ToolBox\Tool\Wikipedia: ~
