@@ -2,26 +2,24 @@
 
 declare(strict_types=1);
 
-namespace App\Mcp\MethodHandler;
+namespace App\Mcp\Server\MethodHandler;
 
+use App\Mcp\Message\Notification;
+use App\Mcp\Message\Request;
+use App\Mcp\Message\Response;
 use PhpLlm\LlmChain\Chain\ToolBox\Metadata;
 use PhpLlm\LlmChain\Chain\ToolBox\ToolBoxInterface;
 
-final readonly class ToolListHandler implements MethodHandler
+final class ToolListHandler extends RequestHandler
 {
     public function __construct(
         private ToolBoxInterface $toolBox,
     ) {
     }
 
-    public function supports(string $method): bool
+    public function createResponse(Request|Notification $message): Response
     {
-        return 'tools/list' === $method;
-    }
-
-    public function getResult(array $parameter): array
-    {
-        return [
+        return new Response($message->id, [
             'tools' => array_map(function (Metadata $tool) {
                 return [
                     'name' => $tool->name,
@@ -31,7 +29,12 @@ final readonly class ToolListHandler implements MethodHandler
                         '$schema' => 'http://json-schema.org/draft-07/schema#',
                     ],
                 ];
-            }, $this->toolBox->getMap())
-        ];
+            }, $this->toolBox->getMap()),
+        ]);
+    }
+
+    protected function supportedMethod(): string
+    {
+        return 'tools/list';
     }
 }

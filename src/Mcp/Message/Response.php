@@ -4,16 +4,25 @@ declare(strict_types=1);
 
 namespace App\Mcp\Message;
 
-final class Response implements \JsonSerializable
+final readonly class Response implements \JsonSerializable
 {
-    public string|int $id;
-    public array $result = [];
+    /**
+     * @param array<string, mixed> $result
+     */
+    public function __construct(
+        public string|int $id,
+        public array $result = [],
+    ) {
+    }
 
-    public function jsonSerialize(): mixed
+    /**
+     * @return array{jsonrpc: string, id: string|int, result: array<string, mixed>}
+     */
+    public function jsonSerialize(): array
     {
         return [
             'jsonrpc' => '2.0',
-            'id' => $this->id ?? 0,
+            'id' => $this->id,
             'result' => $this->result,
         ];
     }

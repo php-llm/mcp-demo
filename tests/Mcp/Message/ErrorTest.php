@@ -2,37 +2,34 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Mcp;
+namespace App\Tests\Mcp\Message;
 
 use App\Mcp\Message\Error;
 use PHPUnit\Framework\TestCase;
 
 final class ErrorTest extends TestCase
 {
-    public function testWithoutData(): void
+    public function testWithIntegerId(): void
     {
-        $error = new Error();
+        $error = new Error(1, -32602, 'Another error occurred');
         $expected = [
             'jsonrpc' => '2.0',
-            'id' => 0,
+            'id' => 1,
             'error' => [
-                'code' => -32601,
-                'message' => 'An error occurred',
+                'code' => -32602,
+                'message' => 'Another error occurred',
             ],
         ];
 
         self::assertSame($expected, $error->jsonSerialize());
     }
 
-    public function testWithDataIntegerId(): void
+    public function testWithStringId(): void
     {
-        $error = new Error();
-        $error->id = 1;
-        $error->code = -32602;
-        $error->message = 'Another error occurred';
+        $error = new Error('abc', -32602, 'Another error occurred');
         $expected = [
             'jsonrpc' => '2.0',
-            'id' => 1,
+            'id' => 'abc',
             'error' => [
                 'code' => -32602,
                 'message' => 'Another error occurred',
