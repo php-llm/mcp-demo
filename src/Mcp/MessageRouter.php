@@ -31,12 +31,14 @@ final class MessageRouter
 
     public function route(string $payload): string
     {
+        $this->logger->info('Received payload', ['payload' => $payload]);
+
         $message = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
         $id = $message['id'] ?? 0;
-        $method = $message['method'] ?? null;
+        $method = $message['method'] ?? '';
         $params = $message['params'] ?? [];
 
-        $this->logger->info('Received message', ['method' => $method, 'params' => $params]);
+        $this->logger->info('Decoded message', ['method' => $method, 'params' => $params]);
 
         if ('notifications/initialized' === $method) {
             return '';
@@ -54,7 +56,11 @@ final class MessageRouter
             $response->message = $exception->getMessage();
         }
 
-        $this->logger->info('Sending response', ['response' => $response]);
+        $this->logger->info('Created response', ['response' => $response]);
+
+        if (isset($response->result) && [] === $response->result) {
+            return json_encode($response, JSON_THROW_ON_ERROR | JSON_FORCE_OBJECT);
+        }
 
         return json_encode($response, JSON_THROW_ON_ERROR);
     }
