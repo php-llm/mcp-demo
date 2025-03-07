@@ -22,3 +22,23 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # TODO: MOVE TO MCP BUNDLE
+
+    _instanceof:
+        PhpLlm\McpSdk\Server\NotificationHandler:
+            tags: [ 'mcp.notification_handler' ]
+        PhpLlm\McpSdk\Server\RequestHandler:
+            tags: [ 'mcp.request_handler' ]
+
+    PhpLlm\McpSdk\Message\Factory: ~
+    PhpLlm\McpSdk\Server: ~
+    PhpLlm\McpSdk\Server\JsonRpcHandler:
+        $notificationHandlers: !tagged mcp.notification_handler
+        $requestHandlers: !tagged mcp.request_handler
+    PhpLlm\McpSdk\Server\NotificationHandler\InitializedHandler: ~
+    PhpLlm\McpSdk\Server\Transport\Sse\Store\CachePoolStore: ~
+    PhpLlm\McpSdk\Server\RequestHandler\InitializeHandler: ~
+    PhpLlm\McpSdk\Server\RequestHandler\PingHandler: ~
+    PhpLlm\McpSdk\Server\RequestHandler\ToolCallHandler: ~
+    PhpLlm\McpSdk\Server\RequestHandler\ToolListHandler: ~

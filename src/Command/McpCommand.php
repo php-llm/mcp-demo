@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Mcp\Server;
-use App\Mcp\Server\Transport\Stdio\SymfonyConsoleTransport;
+use PhpLlm\McpSdk\Server;
+use PhpLlm\McpSdk\Server\Transport\Stdio\SymfonyConsoleTransport;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

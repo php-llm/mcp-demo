@@ -14,7 +14,7 @@ Simple demo gluing together [MCP](https://modelcontextprotocol.io/) with Symfony
 Setting up the Symfony project:
 
 ```bash
-git clone git@github.com:chr-hertel/mcp-demo.git
+git clone git@github.com:php-llm/mcp-demo.git
 cd mcp-demo
 composer install
 symfony serve -d --no-tls
