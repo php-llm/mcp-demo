@@ -9,27 +9,35 @@ use App\Mcp\Message\Factory;
 use App\Mcp\Message\Notification;
 use App\Mcp\Message\Request;
 use App\Mcp\Message\Response;
-use App\Mcp\Server\MethodHandler\MessageHandler;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final readonly class JsonRpcHandler
 {
     /**
-     * @var array<int, MessageHandler>
+     * @var array<int, RequestHandler>
      */
-    private array $handlers;
+    private array $requestHandlers;
 
     /**
-     * @param iterable<MessageHandler> $handlers
+     * @var array<int, NotificationHandler>
+     */
+    private array $notificationHandlers;
+
+    /**
+     * @param iterable<RequestHandler>      $requestHandlers
+     * @param iterable<NotificationHandler> $notificationHandlers
      */
     public function __construct(
         private Factory $messageFactory,
-        #[AutowireIterator('mcp.message_handler')]
-        iterable $handlers,
+        #[AutowireIterator('mcp.request_handler')]
+        iterable $requestHandlers,
+        #[AutowireIterator('mcp.notification_handler')]
+        iterable $notificationHandlers,
         private LoggerInterface $logger,
     ) {
-        $this->handlers = $handlers instanceof \Traversable ? iterator_to_array($handlers) : $handlers;
+        $this->requestHandlers = $requestHandlers instanceof \Traversable ? iterator_to_array($requestHandlers) : $requestHandlers;
+        $this->notificationHandlers = $notificationHandlers instanceof \Traversable ? iterator_to_array($notificationHandlers) : $notificationHandlers;
     }
 
     public function process(string $message): ?string
@@ -51,7 +59,8 @@ final readonly class JsonRpcHandler
         $this->logger->info('Decoded incoming message', ['message' => $message]);
 
         try {
-            return $this->encodeResponse($this->getResponse($message));
+            return $message instanceof Notification
+                ? $this->handleNotification($message) : $this->encodeResponse($this->handleRequest($message));
         } catch (\DomainException) {
             return null;
         } catch (\InvalidArgumentException $exception) {
@@ -78,14 +87,27 @@ final readonly class JsonRpcHandler
         return json_encode($response, JSON_THROW_ON_ERROR);
     }
 
-    private function getResponse(Request|Notification $message): Response|Error
+    private function handleNotification(Notification $notification): null
     {
-        foreach ($this->handlers as $handler) {
-            if ($handler->supports($message)) {
-                return $handler->createResponse($message) ?? throw new \DomainException('Response is null');
+        foreach ($this->notificationHandlers as $handler) {
+            if ($handler->supports($notification)) {
+                return $handler->handle($notification);
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('Method "%s" not found', $message->method));
+        $this->logger->warning(sprintf('No handler found for "%s".', $notification->method), ['notification' => $notification]);
+
+        return null;
+    }
+
+    private function handleRequest(Request $request): Response|Error
+    {
+        foreach ($this->requestHandlers as $handler) {
+            if ($handler->supports($request)) {
+                return $handler->createResponse($request);
+            }
+        }
+
+        throw new \InvalidArgumentException(sprintf('No handler found for method "%s".', $request->method));
     }
 }

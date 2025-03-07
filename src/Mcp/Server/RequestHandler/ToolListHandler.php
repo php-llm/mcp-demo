@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Mcp\Server\MethodHandler;
+namespace App\Mcp\Server\RequestHandler;
 
 use App\Mcp\Message\Notification;
 use App\Mcp\Message\Request;
@@ -10,10 +10,10 @@ use App\Mcp\Message\Response;
 use PhpLlm\LlmChain\Chain\ToolBox\Metadata;
 use PhpLlm\LlmChain\Chain\ToolBox\ToolBoxInterface;
 
-final class ToolListHandler extends RequestHandler
+final class ToolListHandler extends BaseRequestHandler
 {
     public function __construct(
-        private ToolBoxInterface $toolBox,
+        private readonly ToolBoxInterface $toolBox,
     ) {
     }
 

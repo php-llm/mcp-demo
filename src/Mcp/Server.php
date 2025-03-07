@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Mcp;
 
 use App\Mcp\Server\JsonRpcHandler;
-use App\Mcp\Server\Transport\Transport;
+use App\Mcp\Server\Transport;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -24,6 +24,10 @@ final readonly class Server
 
         while ($transport->isConnected()) {
             foreach ($transport->receive() as $message) {
+                if (null === $message) {
+                    continue;
+                }
+
                 $response = $this->jsonRpcHandler->process($message);
 
                 if (null === $response) {

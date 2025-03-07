@@ -1,10 +1,16 @@
 inspector:
 	npx -y @modelcontextprotocol/inspector
 
-restart:
-	symfony server:stop
-	symfony server:start -d
+start:
+	symfony server:start -d --no-tls
+
+log:
 	symfony server:log
+
+stop:
+	symfony server:stop
+
+restart: stop start log
 
 ci: codestyle phpstan test
 

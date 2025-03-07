@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Mcp\Server\MethodHandler;
+namespace App\Mcp\Server\RequestHandler;
 
 use App\Mcp\Message\Notification;
 use App\Mcp\Message\Request;
 use App\Mcp\Message\Response;
 
-final class PingHandler extends RequestHandler
+final class PingHandler extends BaseRequestHandler
 {
     public function createResponse(Request|Notification $message): Response
     {

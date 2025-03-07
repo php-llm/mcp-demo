@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Mcp\Server\Transport;
+namespace App\Mcp\Server;
 
 interface Transport
 {

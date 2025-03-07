@@ -2,22 +2,27 @@
 
 declare(strict_types=1);
 
-namespace App\Mcp\Server\MethodHandler;
+namespace App\Mcp\Server\RequestHandler;
 
-use App\Mcp\Message\Notification;
 use App\Mcp\Message\Request;
 use App\Mcp\Message\Response;
 
-final class InitializeHandler extends RequestHandler
+final class InitializeHandler extends BaseRequestHandler
 {
-    public function createResponse(Request|Notification $message): Response
+    public function __construct(
+        private readonly string $name = 'app',
+        private readonly string $version = 'dev',
+    ) {
+    }
+
+    public function createResponse(Request $message): Response
     {
         return new Response($message->id, [
             'protocolVersion' => '2024-11-05',
             'capabilities' => [
                 'tools' => ['listChanged' => true],
             ],
-            'serverInfo' => ['name' => 'mcp-demo', 'version' => '0.0.1'],
+            'serverInfo' => ['name' => $this->name, 'version' => $this->version],
         ]);
     }
 
